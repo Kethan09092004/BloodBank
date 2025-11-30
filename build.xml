@@ -1,8 +1,7 @@
 <?xml version="1.0"?>
 <project name="BloodBank" default="dist" basedir=".">
-  <!-- adjust these if your project uses different folders -->
+  <!-- folders (change if your project differs) -->
   <property name="src.dir" value="src"/>
-  <!-- Try common web folders; if using WebContent, change below to WebContent -->
   <property name="web.dir" value="src/main/webapp"/>
   <condition property="web.dir" value="WebContent">
     <and>
@@ -18,6 +17,9 @@
   <property name="dist.dir" value="dist"/>
   <property name="war.name" value="BloodBank.war"/>
 
+  <!-- set property if src folder exists -->
+  <available file="${src.dir}" type="dir" property="has.src"/>
+
   <target name="clean">
     <delete dir="${build.dir}"/>
     <delete dir="${dist.dir}"/>
@@ -28,14 +30,13 @@
     <mkdir dir="${dist.dir}"/>
   </target>
 
-  <target name="compile" depends="prepare">
-    <condition property="has.src">
-      <available file="${src.dir}" type="dir"/>
-    </condition>
-    <echo message="Compiling Java sources if present (src = ${src.dir})"/>
-    <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" if="has.src" />
+  <!-- compile only runs when has.src is true -->
+  <target name="compile" depends="prepare" if="has.src">
+    <echo message="Compiling Java sources (src = ${src.dir})"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" />
   </target>
 
+  <!-- When no sources exist, compile target is skipped and build continues -->
   <target name="copy-web" depends="compile">
     <echo message="Copying web files from ${web.dir} to ${build.dir}"/>
     <copy todir="${build.dir}">
