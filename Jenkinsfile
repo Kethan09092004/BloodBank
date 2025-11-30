@@ -29,7 +29,7 @@ pipeline {
             echo Undeploying previous app (if exists)...
             curl -s -u %TOMCAT_USER%:%TOMCAT_PASS% "http://localhost:8080/manager/text/undeploy?path=/BloodBank" || echo "undeploy ignored"
             echo Deploying new WAR...
-            curl -s -u %TOMCAT_USER%:%TOMCAT_PASS% -T "%WAR%" "http://localhost:8080/manager/text/deploy?path=/BloodBank&update=true"
+            curl -s -u %TOMCAT_USER%:%TOMCAT_PASS% -T "%WAR%" "http://localhost:8090/manager/text/deploy?path=/BloodBank&update=true"
           """
         }
       }
@@ -40,7 +40,7 @@ pipeline {
         echo 'Waiting for app to start...'
         bat 'timeout /t 5 >nul'
         // check the main page, fails pipeline if non-200
-        bat 'curl -f "http://localhost:8080/BloodBank/index.jsp"'
+        bat 'curl -f "http://localhost:8090/BloodBank/index.jsp"'
       }
     }
   }
