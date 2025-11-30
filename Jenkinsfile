@@ -34,6 +34,15 @@ pipeline {
         }
       }
     }
+     stage('Smoke test') {
+      steps {
+        echo 'Waiting for app to start...'
+        bat 'timeout /t 5 >nul'
+        // check the main page, fails pipeline if non-200
+        bat 'curl -f "http://localhost:8090/BloodBank/index.jsp"'
+      }
+    }
+  }
 
    
 
