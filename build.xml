@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<project name="BloodBank" default="dist" basedir=".">
+  <!-- adjust these if your project uses different folders -->
+  <property name="src.dir" value="src"/>
+  <!-- Try common web folders; if using WebContent, change below to WebContent -->
+  <property name="web.dir" value="src/main/webapp"/>
+  <condition property="web.dir" value="WebContent">
+    <and>
+      <available file="WebContent" type="dir"/>
+      <not>
+        <available file="src/main/webapp" type="dir"/>
+      </not>
+    </and>
+  </condition>
+
+  <property name="build.dir" value="build"/>
+  <property name="classes.dir" value="${build.dir}/WEB-INF/classes"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="war.name" value="BloodBank.war"/>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <target name="prepare">
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${dist.dir}"/>
+  </target>
+
+  <target name="compile" depends="prepare">
+    <condition property="has.src">
+      <available file="${src.dir}" type="dir"/>
+    </condition>
+    <echo message="Compiling Java sources if present (src = ${src.dir})"/>
+    <javac srcdir="${src.dir}" destdir="${classes.dir}" includeantruntime="false" if="has.src" />
+  </target>
+
+  <target name="copy-web" depends="compile">
+    <echo message="Copying web files from ${web.dir} to ${build.dir}"/>
+    <copy todir="${build.dir}">
+      <fileset dir="${web.dir}"/>
+    </copy>
+    <copy todir="${build.dir}/WEB-INF/classes">
+      <fileset dir="${classes.dir}"/>
+    </copy>
+  </target>
+
+  <target name="dist" depends="copy-web">
+    <mkdir dir="${dist.dir}"/>
+    <war destfile="${dist.dir}/${war.name}" webxml="${web.dir}/WEB-INF/web.xml">
+      <fileset dir="${build.dir}"/>
+    </war>
+    <echo message="WAR created at ${dist.dir}/${war.name}"/>
+  </target>
+</project>
