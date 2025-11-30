@@ -28,7 +28,7 @@ pipeline {
             REM Undeploy (ignore error)
             curl -u %TOMCAT_USER%:%TOMCAT_PASS% "http://<TOMCAT_HOST>:8080/manager/text/undeploy?path=/BloodBank" || echo "undeploy failed"
             REM Deploy new WAR
-            curl -u %TOMCAT_USER%:%TOMCAT_PASS% -T "%WAR%" "http://<TOMCAT_HOST>:8080/manager/text/deploy?path=/BloodBank&update=true"
+            curl -u %TOMCAT_USER%:%TOMCAT_PASS% -T "%WAR%" "http://localhost:8090/manager/text/deploy?path=/BloodBank&update=true"
           """
         }
       }
@@ -36,7 +36,7 @@ pipeline {
 
     stage('Smoke test') {
       steps {
-        bat 'timeout /t 5 >nul & curl -f "http://<TOMCAT_HOST>:8080/BloodBank/index.jsp"'
+        bat 'timeout /t 5 >nul & curl -f "http://localhost:8090/BloodBank/index.jsp"'
       }
     }
   }
