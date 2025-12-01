@@ -16,29 +16,49 @@
     ResultSet rs = null;
 
     // Approve or reject
-    String action = request.getParameter("action");
-    String userIdParam = request.getParameter("user_id");
-    if(action != null && userIdParam != null) {
-        try {
-            con = getConnection();
-            int uid = Integer.parseInt(userIdParam);
-            String approvalValue = action.equals("approve") ? "Y" : "N";
+   // Approve or reject
+String action = request.getParameter("action");
+String userIdParam = request.getParameter("user_id");
+if (action != null && userIdParam != null) {
+    Connection conAct = null;
+    PreparedStatement psAct = null;
+    try {
+        conAct = getConnection();
+        int uid = Integer.parseInt(userIdParam);
+        boolean isApprove = "approve".equalsIgnoreCase(action);
 
-            // Only update users table
-            String sql = "UPDATE users SET IS_APPROVED=? WHERE USER_ID=?";
-            ps = con.prepareStatement(sql);
-            ps.setString(1, approvalValue);
-            ps.setInt(2, uid);
-            ps.executeUpdate();
-            ps.close();
+        // Update users table
+        String userUpdateSql = "UPDATE users SET IS_APPROVED = ? WHERE USER_ID = ?";
+        psAct = conAct.prepareStatement(userUpdateSql);
+        psAct.setString(1, isApprove ? "Y" : "N");
+        psAct.setInt(2, uid);
+        psAct.executeUpdate();
+        psAct.close();
 
-        } catch(Exception e) {
-            out.println("Error: " + e.getMessage());
-        } finally {
-            try { if(ps!=null) ps.close(); } catch(SQLException e){}
-            try { if(con!=null) con.close(); } catch(SQLException e){}
+        // If approving/rejecting a bank admin, also update the bank's status
+        if ("BANK_ADMIN".equalsIgnoreCase(type)) {
+            String bankStatus = isApprove ? "APPROVED" : "REJECTED"; // choose your semantics
+            String bankUpdateSql = "UPDATE blood_banks SET STATUS = ? WHERE USER_ID = ?";
+            psAct = conAct.prepareStatement(bankUpdateSql);
+            psAct.setString(1, bankStatus);
+            psAct.setInt(2, uid);
+            psAct.executeUpdate();
+            psAct.close();
         }
+
+        // Redirect to avoid double submission and refresh the listing
+        response.sendRedirect("approvals.jsp?type=" + type);
+
+        return; // stop further processing on this request
+
+    } catch (Exception e) {
+        out.println("<div class='msg error'>Error updating approval: " + e.getMessage() + "</div>");
+    } finally {
+        try { if (psAct != null) psAct.close(); } catch (SQLException e) {}
+        try { if (conAct != null) conAct.close(); } catch (SQLException e) {}
     }
+}
+
 
     // Fetch pending users
     try {
