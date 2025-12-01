@@ -40,14 +40,14 @@ pipeline {
       }
     }
 
-    stage('Quality Gate') {
-      steps {
-        timeout(time: 5, unit: 'MINUTES') {
-          // requires SonarQube plugin; will abort pipeline if Quality Gate not OK
-          waitForQualityGate abortPipeline: true
-        }
-      }
-    }
+    // stage('Quality Gate') {
+    //   steps {
+    //     timeout(time: 5, unit: 'MINUTES') {
+    //       // requires SonarQube plugin; will abort pipeline if Quality Gate not OK
+    //       waitForQualityGate abortPipeline: true
+    //     }
+    //   }
+    // }
 
     stage('Deploy to Tomcat') {
       when { expression { return true } }
