@@ -19,6 +19,31 @@ pipeline {
         archiveArtifacts artifacts: 'dist/*.war', fingerprint: true
       }
     }
+    stage('SonarQube Analysis') {
+  steps {
+    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+      withSonarQubeEnv('SonarQube') { 
+        bat """
+          sonar-scanner ^
+            -Dsonar.projectKey=BloodBank ^
+            -Dsonar.sources=src ^
+            -Dsonar.java.binaries=build\\WEB-INF\\classes ^
+            -Dsonar.host.url=%SONAR_HOST_URL% ^
+            -Dsonar.login=%SONAR_TOKEN%
+        """
+      }
+    }
+  }
+}
+
+stage('Quality Gate') {
+  steps {
+    timeout(time: 5, unit: 'MINUTES') {
+      waitForQualityGate abortPipeline: true
+    }
+  }
+}
+
 
    stage('Deploy to Tomcat') {
   when { expression { return true } }
