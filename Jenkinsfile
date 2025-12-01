@@ -95,7 +95,7 @@ pipeline {
         // wait ~5s without using timeout
         bat 'ping -n 6 127.0.0.1 >nul'
         // check the main page, fail pipeline if non-200; use --silent to reduce output but -f to fail on HTTP error
-        bat 'curl -f "http://localhost:8091/BloodBank/index.jsp"'
+        bat 'curl -f "http://localhost:13968/BloodBank/index.jsp"'
       }
     }
   }
