@@ -27,9 +27,9 @@ pipeline {
           bat """
             set WAR=%WORKSPACE%\\dist\\BloodBank.war
             echo Undeploying previous app (if exists)...
-            curl -s -u %TOMCAT_USER%:%TOMCAT_PASS% "http://localhost:8091/manager/text/undeploy?path=/BloodBank" || echo "undeploy ignored"
+            curl -s -u %TOMCAT_USER%:%TOMCAT_PASS% "http://localhost:8092/manager/text/undeploy?path=/BloodBank" || echo "undeploy ignored"
             echo Deploying new WAR...
-            curl -s -u %TOMCAT_USER%:%TOMCAT_PASS% -T "%WAR%" "http://localhost:8091/manager/text/deploy?path=/BloodBank&update=true"
+            curl -s -u %TOMCAT_USER%:%TOMCAT_PASS% -T "%WAR%" "http://localhost:8092/manager/text/deploy?path=/BloodBank&update=true"
           """
         }
       }
